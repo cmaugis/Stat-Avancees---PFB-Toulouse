@@ -1,3 +1,6 @@
-Ce dossier contient des scripts .Rmd pour les TP. 
-Ces fichiers sont à télécharger et à sauvegarder avec les fichiers de données (/Data). 
-Ils seront à compléter au fur et à mesure de la séance de TP sous RStudio. 
+Ce dossier contient pour le TP associé à chaque partie du cours : 
+- un script .Rmd :
+    Ce fichier est à télécharger et à sauvegarder avec les fichiers de données (/Data). 
+    Il sera à compléter au fur et à mesure de la séance de TP sous RStudio. 
+- un fichier .html qui est le sujet du TP 
+
