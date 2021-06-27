@@ -8,8 +8,18 @@
 
 Pour installer un package R, deux options:
 
-1. taper dans une console R la commande `install.packages("pakage_name")`
-2. passer par le menu sous Rstudio: Tools > Install Packages
+1. passer par le menu sous Rstudio: Tools > Install Packages
+2. taper dans une console R la commande `install.packages("pakage_name")`
 
+Pour l'option 1, il suffit donc de copier (une par une) les lignes suivantes dans la console R:
 
-
+```r
+install.packages("ggplot2")
+install.packages("gridExtra")
+install.packages("ggfortify")
+install.packages("leaps")
+install.packages("tidyverse")
+install.packages("FactoMineR")
+install.packages("glmnet")
+install.packages("corrplot")
+```
