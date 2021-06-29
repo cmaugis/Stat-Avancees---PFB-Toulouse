@@ -4,7 +4,7 @@
 
 - Avant la formation :
   + Installer Rstudio (https://www.rstudio.com/products/rstudio/download/) et R (https://cran.r-project.org/). **Merci de vérifier que vous avez bien une version récente de R (≥ 4.0)**
-  + Installer les packages R suivants : ggplot2, gridExtra, ggfortify, leaps, tidyverse, FactoMineR, glmnet, corrplot
+  + Installer les packages R suivants : ggplot2, gridExtra, ggfortify, leaps, tidyverse, FactoMineR, glmnet, corrplot, rpart, rpart.plot
 
 Pour installer un package R, deux options:
 
@@ -22,4 +22,6 @@ install.packages("tidyverse")
 install.packages("FactoMineR")
 install.packages("glmnet")
 install.packages("corrplot")
+install.packages("rpart")
+install.packages("rpart.plot")
 ```
