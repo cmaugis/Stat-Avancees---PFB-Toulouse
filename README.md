@@ -4,7 +4,7 @@
 
 - Avant la formation :
   + Installer Rstudio (https://www.rstudio.com/products/rstudio/download/) et R (https://cran.r-project.org/). **Merci de vérifier que vous avez bien une version récente de R (≥ 4.0)**
-  + Installer les packages R suivants : ggplot2, gridExtra, ggfortify, leaps, tidyverse, FactoMineR, glmnet, corrplot, rpart, rpart.plot
+  + Installer les packages R suivants : bestglm, corrplot, ellipse, FactoMineR, ggfortify, ggplot2, glmnet, gridExtra, knitr, leaps, plotly, randomForest, ROCR, rpart, rpart.plot, tidyverse, VGAM.
 
 Pour installer un package R, deux options:
 
@@ -14,14 +14,21 @@ Pour installer un package R, deux options:
 Pour l'option 2, il suffit donc de copier (une par une) les lignes suivantes dans la console R:
 
 ```r
-install.packages("ggplot2")
-install.packages("gridExtra")
-install.packages("ggfortify")
-install.packages("leaps")
-install.packages("tidyverse")
-install.packages("FactoMineR")
-install.packages("glmnet")
+install.packages("bestglm")
 install.packages("corrplot")
+install.packages("ellipse")
+install.packages("FactoMineR")
+install.packages("ggfortify")
+install.packages("ggplot2")
+install.packages("glmnet")
+install.packages("gridExtra")
+install.packages("knitr")
+install.packages("leaps")
+install.packages("plotly")
+install.packages("randomForest")
+install.packages("ROCR")
 install.packages("rpart")
 install.packages("rpart.plot")
+install.packages("tidyverse")
+install.packages("VGAM")
 ```
