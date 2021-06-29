@@ -34,7 +34,7 @@ opts_knit$set(width=75)
 
 Les librairies R nécessaires pour ce TP : 
 
-```{r,echo=T, error=F,warning=F}
+```{r, echo=TRUE, error=FALSE, warning=FALSE}
 library(ellipse)
 library(leaps)
 library(MASS)
@@ -82,12 +82,13 @@ Les données sont disponibles dans le fichier "Ozone.txt" sur la page https://gi
 Pour les lire, vous pouvez utiliser la commande suivante :
 
 ```{r}
-ozone = read.table("Ozone.txt")
+url <- url("https://raw.githubusercontent.com/cmaugis/Stat-Avancees---PFB-Toulouse/main/Data/Ozone.txt")
+ozone = read.table(url)
 ```
 
 ```{r}
-ozone$vent=as.factor(ozone$vent)
-ozone$pluie=as.factor(ozone$pluie)
+ozone$vent <- as.factor(ozone$vent)
+ozone$pluie <- as.factor(ozone$pluie)
 summary(ozone)
 ```
 
@@ -98,39 +99,42 @@ Afin de se familiariser avec les données, nous allons faire quelques statistiqu
 Distribution des variables quantitatives : 
 
 ```{r}
-A = data.frame(y=as.vector(as.matrix(t(ozone[,1:11]))),x=rep(colnames(ozone[,1:11]),nrow(ozone[,1:11])))
-ggplot(A,aes(x=x,y=y))+
-  geom_violin()+
-  xlab("")+ylab("")
+oz_quanti <- ozone[, 1:11]
+A <- data.frame(y = as.vector(as.matrix(t(oz_quanti))),
+               x = rep(colnames(oz_quanti),
+                       nrow(oz_quanti)))
+ggplot(A, aes(x = x, y = y)) +
+  geom_violin() +
+  xlab("") + ylab("")
 ```
 
 Répartition des variables qualitatives *vent* et *pluie* : 
 
 ```{r}
-g1=ggplot(ozone, aes(x=vent))+
-  geom_bar()+
-  xlab("")+
+g1 <- ggplot(ozone, aes(x = vent)) +
+  geom_bar() +
+  xlab("") +
   ggtitle("Vent")
-g2=ggplot(ozone, aes(x=pluie))+
-  geom_bar()+
-  xlab("")+
+g2 <- ggplot(ozone, aes(x=pluie)) +
+  geom_bar() +
+  xlab("") +
   ggtitle("Pluie")
-grid.arrange(g1,g2,ncol=2)
+grid.arrange(g1, g2, ncol = 2)
 ```
 
 Matrice des corrélations entre variables quantitatives : 
 
 ```{r}
-corrplot(cor(ozone[,1:11]),method="ellipse")
+corrplot(cor(oz_quanti), method = "ellipse")
 ```
 
 Analyse en composantes principales : 
 
 ```{r}
-respca = PCA(ozone,scale.unit=T,quali.sup=c(12,13),graph=F)
-plot(respca,choix="ind",habillage=12,label="none")
-plot(respca,choix="ind",habillage=13,label="none")
-plot(respca,choix="varcor")
+respca <- PCA(ozone,scale.unit = TRUE, quali.sup = c(12,13), graph = FALSE)
+plot(respca,choix = "ind", habillage = 12, label = "none")
+plot(respca,choix = "ind", habillage = 13, label = "none")
+plot(respca,choix = "varcor")
 ```
 
 # Régression linéaire 
@@ -142,12 +146,7 @@ Dans cette partie, nous souhaitons analyser la relation entre le maximum journal
 + la projection du vent sur l'axe Est-Ouest à différentes heures de la journée (*Vx9, Vx12,Vx15*), 
 + la concentration maximale d'ozone de la veille (*maxO3v*)
 
-On va donc utiliser le sous-jeu de données suivant 
-```{r}
-ozone1 = ozone[,1:11]
-```
-
-et mettre en place un modèle de régression linéaire multiple.
+On va donc utiliser le sous-jeu de données `oz_quanti` et mettre en place un modèle de régression linéaire multiple.
 
 ## Question 1 
 
@@ -170,7 +169,7 @@ Effectuez la régression linéaire à l'aide de la fonction `lm()` et exploitez 
 
 Que contiennent les sorties suivantes ? 
 
-```{r,eval=F}
+```{r, eval=FALSE}
 reg$coefficients 
 reg$residuals
 ```
@@ -179,7 +178,7 @@ reg$residuals
 ## Question 3 
 A l'aide de la fonction `autoplot()` du package *ggfortify*, etudiez les résidus du modèle afin de vérifier les hypothèses du modèle. 
 
-```{r,eval=F}
+```{r, eval=FALSE}
 # autoplot(...)
 ```
 
@@ -189,7 +188,7 @@ A l'aide de la fonction `autoplot()` du package *ggfortify*, etudiez les résidu
 A l'aide d'une procédure de sélection de variables (que l'on étudiera plus précisément dans la partie 2 du cours), un sous-modèle avec les variables explicatives T12, Ne9, Vx9 et maxO3v est proposé pour expliquer linéairement maxO3. \
 A l'aide de la fonction `anova()` testez si on peut retenir ce sous-modèle par rappport au modèle complet. Commentez. 
 
-```{r,eval=F}
+```{r,eval=FALSE}
 reg.fin = lm(...)
 anova(reg.fin,reg)
 ```
@@ -214,10 +213,11 @@ i=1,\ldots,I=4,\ j=1,\ldots,n_i.\\ (\varepsilon_{ij})_{i,j} \textrm{ i.i.d
 $$
 
 ## Question 1 
+
 Représentez la concentration maximale d'ozone en fonction du vent. Commentez
 
-```{r, eval=F} 
-ggplot(ozone,aes(x=vent,y=maxO3))+
+```{r, eval=FALSE} 
+ggplot(ozone, aes(x = vent, y = maxO3)) +
   geom_violin()
 ```
 
@@ -239,41 +239,43 @@ A l'aide de la fonction `anova()`, testez la significativité du facteur vent. C
 
 
 ## Question 4 
+
 Comparez les différents résultats obtenus par les commandes suivantes. 
 
 ```{r}
-summary(lm(maxO3~vent,data=ozone)) 
-summary(lm(maxO3~C(vent,base=2),data=ozone))
-summary(lm(maxO3~C(vent,sum),data=ozone)) 
+summary(lm(maxO3~vent, data = ozone)) 
+summary(lm(maxO3~C(vent, base = 2), data = ozone))
+summary(lm(maxO3~C(vent, sum),data = ozone)) 
 ```
 
 
 
 ## Question 5 
+
 Au vu des différentes conclusions, quelle modification de la variable vent peut-on considérer pour expliquer la concentration en ozone ? Vérifiez numériquement. 
 
 
 # ANOVA à deux facteurs 
 
-Dans cette section, nous souhaitons analyser la
-relation entre la concentration maximale d'ozone (maxO3) avec la direction du vent (vent) et la précipitation (pluie). 
-On va donc mettre en place un modèle d'analyse de la variance à deux facteurs.
+Dans cette section, nous souhaitons analyser la relation entre la concentration maximale d'ozone (maxO3) avec la direction du vent (vent) et la précipitation (pluie).  On va donc mettre en place un modèle d'analyse de la variance à deux facteurs.
 
 ```{r}
-table(ozone$vent,ozone$pluie)
+table(ozone$vent, ozone$pluie)
 ```
 
 
 ## Question 1 
+
 Représentez la concentration en ozone pour chaque modalité croisée du vent et de la pluie à l'aide de la commande suivante et commentez. 
 
 ```{r,eval=F}
-ggplot(ozone,aes(x=vent,y=maxO3,fill=pluie))+ 
+ggplot(ozone, aes(x = vent, y = maxO3, fill = pluie)) +
   geom_boxplot() 
 ``` 
 
 
 ## Question 2 
+
 Mettez en place un modèle d'analyse de la variance avec interaction.
 Commentez les résultats.
 
@@ -283,47 +285,50 @@ Commentez les résultats.
 
 
 ## Question 3 
+
 A l'aide de la fonction `anova()`, testez si l'on peut simplifier ce modèle d'ANOVA à deux facteurs avec interaction. 
 
 
 # Analyse de la covariance 
 
-Dans cette partie, on s'intéresse à la relation du
-taux maximal d'ozone (*maxO3*) par rapport à celui de la veille (*maxO3v*) et en fonction des précipitations (*pluie*). Pour cela, on va mettre en place un modèle d'analyse de la covariance.
+Dans cette partie, on s'intéresse à la relation du taux maximal d'ozone (*maxO3*) par rapport à celui de la veille (*maxO3v*) et en fonction des précipitations (*pluie*). Pour cela, on va mettre en place un modèle d'analyse de la covariance.
 
 ## Question 1 
-A l'aide des commandes suivantes, représentez le nuage de points entre la
-variable à expliquer *maxO3* et la variable quantitative explicative *maxO3v*, en fonction des modalités de la variable qualitative *pluie*. Commentez. 
 
-```{r,eval=F}
-ggplot(ozone,aes(x=maxO3v,y=maxO3))+ 
-  geom_point(aes(shape=pluie,col=pluie)) 
+A l'aide des commandes suivantes, représentez le nuage de points entre la variable à expliquer *maxO3* et la variable quantitative explicative *maxO3v*, en fonction des modalités de la variable qualitative *pluie*. Commentez. 
+
+```{r,eval=FALSE}
+ggplot(ozone, aes(x = maxO3v, y = maxO3))+ 
+  geom_point(aes(shape = pluie, col = pluie)) 
 ```
 
 ## Question 2 
+
 A l'aide de la fonction `lm()` ajustez un modèle d'analyse de covariance avec interaction.
 
-```{r,eval=F}
-complet=lm(....)
+```{r,eval=FALSE}
+complet <- lm(....)
 summary(complet)
 ```
 
 Graphiquement, on vient d'ajuster les deux droites suivantes : 
 
-```{r,eval=F}
-ggplot(ozone,aes(x=maxO3v,y=maxO3, shape=pluie,col=pluie))+ 
-  geom_point()+
-  geom_smooth(method='lm',se=T) 
+```{r,eval=FALSE}
+ggplot(ozone,aes(x = maxO3v, y = maxO3, shape = pluie, col = pluie)) + 
+  geom_point() +
+  geom_smooth(method = 'lm', se = TRUE) 
 ```
 
 ## Question 3 
+
 A l'aide des commandes suivantes, on teste s'il y a un effet d'interaction entre la variable *pluie* et la variable *max03v* pour expliquer *max03*. 
 Commentez. 
 
-```{r,eval=F} 
-penteu = lm(maxO3~-1+pluie+ maxO3v,data=ozone) 
-anova(penteu,complet) 
+```{r,eval=FALSE} 
+penteu = lm(maxO3~-1 + pluie + maxO3v, data = ozone)
+anova(penteu, complet) 
 ```
 
 ## Question 4 
+
 Peut-on encore simplifier le modèle ? Mettez en place des tests de Fisher de sous-modèle grâce à la fonction `anova()`. 
