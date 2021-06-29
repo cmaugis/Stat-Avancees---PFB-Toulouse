@@ -1,5 +1,5 @@
 ---
-title: "TP modèles linéaires - Partie 1"
+title: "TP modèles linéaires - Partie 2"
 date: "`r Sys.Date()`"
 author : "Cathy Maugis-Rabusseau & Pierre Neuvial"
 output:
@@ -19,16 +19,16 @@ background-color: #C9DDE4;
 ```{r setup, echo=FALSE, cache=FALSE}
 library(knitr)
 ## Global options
-options(max.print="75")
-opts_chunk$set(echo=TRUE,
-	             cache=FALSE,
-               prompt=FALSE,
-               tidy=TRUE,
-               comment=NA,
-               message=FALSE,
-               warning=FALSE,
-               class.source="badCode")
-opts_knit$set(width=75)
+options(max.print = "75")
+opts_chunk$set(echo = TRUE,
+	             cache = FALSE,
+               prompt = FALSE,
+               tidy = TRUE,
+               comment = NA,
+               message = FALSE,
+               warning = FALSE,
+               class.source = "badCode")
+opts_knit$set(width = 75)
 ```
 
 
@@ -69,9 +69,10 @@ Les données sont disponibles [ici]( https://github.com/cmaugis/Stat-Avancees---
 
 Pour les lire, vous pouvez utiliser la commande suivante :
 ```{r}
-ozone = read.table("Ozone.txt")
-ozone$vent=as.factor(ozone$vent)
-ozone$pluie=as.factor(ozone$pluie)
+url <- url("https://raw.githubusercontent.com/cmaugis/Stat-Avancees---PFB-Toulouse/main/Data/Ozone.txt")
+ozone = read.table(url)
+ozone$vent <- as.factor(ozone$vent)
+ozone$pluie <- as.factor(ozone$pluie)
 ```
 Vous pouvez obtenir un résumé du jeu de données `ozone` avec la commande `summary()`. 
 
@@ -82,19 +83,20 @@ summary(ozone)
 On réajuste ici un modèle de régression linéaire avec toutes les variables explicatives (cf TP1) pour la suite. 
 
 ```{r}
-ozone1=ozone[,1:11]
-reg.mul = lm(maxO3~.,data=ozone1)
+oz_quanti <- ozone[,1:11]
+reg.mul <- lm(maxO3~., data = oz_quanti)
 summary(reg.mul)
 ```
 
 
 ## Question 1 
+
 Dans le `summary(reg.mul)`, un test est fait sur chaque coefficient. Il revient à tester que la variable n'apporte pas d'information supplémentaire sachant que toutes les autres variables sont dans le modèle. 
 
 Ici, nous souhaitons aller plus loin dans la possible simplification du modèle. Nous allons utiliser des procédures de choix de modèles pour sélectionner les variables significatives. On va ici comparer la sélection de variable obtenue par différents critères: BIC,  AIC, $R^2$ ajusté, Cp de Mallows. Pour cela, vous pouvez utiliser la fonction  `regsubsets()` de la librairie *leaps* et la fonction `stepAIC()` de la librairie *MASS*. 
 Commentez les résultats obtenus avec les différents critères, vous pourrez vous aider des commandes suivantes :
 
-```{r,eval=F}
+```{r, eval=FALSE}
 library(leaps)
 choix=regsubsets(...) # A COMPLETER
 plot(choix,scale= ....)
@@ -104,12 +106,14 @@ stepAIC(...)
 ```
 
 
-## Question 2 
-A la question précédente, nous retenons 4 variables explicatives T12, Ne9, Vx9 et maxO3v. \
+## Question 2
+
+A la question précédente, nous retenons 4 variables explicatives T12, Ne9, Vx9 et maxO3v.
+
 A l'aide des commandes suivantes, testez le sous-modèle avec les 4 variables retenues contre le modèle complet. Commentez.
 
-```{r,eval=F}
-reg.fin=lm(maxO3~T12+Ne9+Vx9+maxO3v,data=ozone1)
+```{r, eval=FALSE}
+reg.fin <- lm(maxO3 ~ T12 + Ne9 + Vx9 + maxO3v, data = oz_quanti)
 summary(reg.fin)
 anova(reg.fin,reg.mul)
 ```
@@ -119,8 +123,8 @@ anova(reg.fin,reg.mul)
 On va s'intéresser aux régressions ridge, Lasso et Elastic-net dans cette partie. On commence par centrer et réduire les données avant de mettre en place et comparer ces méthodes de régression régularisées. 
 
 ```{r}
-tildeY=scale(ozone1[,1],center=T,scale=T)
-tildeX=scale(ozone1[,-1],center=T,scale=T)
+tildeY = scale(oz_quanti[,1], center = TRUE, scale = TRUE)
+tildeX = scale(oz_quanti[,-1], center = TRUE, scale = TRUE)
 ```
 
 
@@ -129,7 +133,7 @@ tildeX=scale(ozone1[,-1],center=T,scale=T)
 ### Question 1 
  A l'aide de la fonction `glmnet()`, ajustez une régression ridge en faisant varier $\tau$ sur une grille. On stockera le résultat dans la variable `fitridge`. Explorez le contenu de `fitridge`.  
 
-```{r,eval=F}
+```{r, eval=FALSE}
 tau_seq <- seq(0, 1, by = 0.001)
 fitridge <- glmnet(...) # A completer
 summary(fitridge)
@@ -137,124 +141,151 @@ summary(fitridge)
 
 
 ### Question 2 
+
 Tracez les chemins de régularisation de chaque variable et commentez. 
 
-```{r, eval=F}
-df=data.frame(tau = rep(fitridge$lambda,ncol(tildeX)),     
-  theta=as.vector(t(fitridge$beta)),
-  variable=rep(colnames(tildeX),each=length(fitridge$lambda)))
-g1 = ggplot(df,aes(x=tau,y=theta,col=variable))+
-  geom_line()+
-  theme(legend.position="bottom")
+```{r, eval = FALSE}
+df <- data.frame(tau = rep(fitridge$lambda, ncol(tildeX)),     
+  theta = as.vector(t(fitridge$beta)),
+  variable = rep(colnames(tildeX), each = length(fitridge$lambda)))
+g1 <- ggplot(df,aes(x = tau, y = theta, col = variable)) +
+  geom_line() +
+  theme(legend.position = "bottom")
 ggplotly(g1)
 ```
 
 
 ### Question 3 
+
 A l'aide de la fonction `cv.glmnet()` mettez en place une validation croisée pour sélectionner le "meilleur" $\tau$ par l'erreur quadratique moyenne (MSE).   
 
-```{r, eval=F}
+```{r, eval=FALSE}
 ridge_cv <- cv.glmnet(...) # A completer
 best_tau <- ridge_cv$lambda.min
 ```
 
-```{r,eval=F}
-df2=data.frame(tau=ridge_cv$lambda,MSE=ridge_cv$cvm,cvup=ridge_cv$cvup,cvlo=ridge_cv$cvlo)
-ggplot(df2)+
-  geom_line(aes(x=tau,y=MSE))+
-  geom_vline(xintercept = ridge_cv$lambda.min,col="red",linetype="dotted")+
-  geom_line(aes(x=tau,y=cvup),col="blue",linetype="dotted")+
-  geom_line(aes(x=tau,y=cvlo),col="blue",linetype="dotted")+
+```{r, eval=FALSE}
+df2=data.frame(tau=ridge_cv$lambda, MSE=ridge_cv$cvm, 
+               cvup=ridge_cv$cvup, cvlo=ridge_cv$cvlo)
+ggplot(df2) +
+  geom_line(aes(x = tau, y = MSE)) +
+  geom_vline(xintercept = ridge_cv$lambda.min, col="red", linetype = "dotted") +
+  geom_line(aes(x = tau, y = cvup),col="blue", linetype = "dotted") +
+  geom_line(aes(x = tau, y = cvlo),col="blue", linetype = "dotted") +
   xlim(c(0,1))
 ```
 
 La valeur de $\tau$ sélectionnée vaut .... 
 
-```{r,eval=F}
-g1=g1 + geom_vline(xintercept = best_tau,linetype="dotted", color = "red")+
-  xlim(c(0,best_tau+0.1))
+```{r, eval=FALSE}
+g1 <- g1 + geom_vline(xintercept = best_tau,linetype = "dotted", color = "red")+
+  xlim(c(0, best_tau + 0.1))
 g1
 ```
 
 
 ## Régression Lasso
+
 ### Question 1 
+
 A l'aide de la fonction `glmnet()`, ajustez une régression Lasso en faisant varier $\tau$ sur une grille. On stockera le résultat dans la variable `fitlasso`. Explorez le contenu de `fitlasso`. 
 
-```{r,eval=F}
-tau_seq=seq(0,1,0.001)
+```{r, eval=FALSE}
+tau_seq <- seq(0,1,0.001)
 fitlasso <- glmnet(...) # A COMPLETER
 summary(fitlasso)
 ```
 
 
 ### Question 2 
+
 Tracez le chemin de régularisation de chacune des variables et commentez.
 
-```{r,eval=F}
-df=data.frame(tau = rep(fitlasso$lambda,ncol(tildeX)), theta=as.vector(t(fitlasso$beta)),variable=rep(colnames(tildeX),each=length(fitlasso$lambda)))
-g2 = ggplot(df,aes(x=tau,y=theta,col=variable))+
-  geom_line()+
-  theme(legend.position="bottom")
+```{r, eval = FALSE}
+df <- data.frame(tau = rep(fitlasso$lambda, ncol(tildeX)),
+              theta = as.vector(t(fitlasso$beta)),
+              variable=rep(colnames(tildeX),
+                           each=length(fitlasso$lambda)))
+g2 <- ggplot(df,aes(x = tau, y = theta, col = variable)) +
+  geom_line() +
+  theme(legend.position = "bottom")
 ggplotly(g2)
 ```
 
 
-### Question 3 
+### Question 3
+
 A l'aide de la fonction `cv.glmnet()` mettez en place une validation croisée pour sélectionner le "meilleur" $\tau$ par MSE.   
 
-```{r,eval=F}
+```{r, eval=FALSE}
 lasso_cv <- cv.glmnet(...) # A COMPLETER
-best_tau <-lasso_cv$lambda.min
-best_tau1se <-lasso_cv$lambda.1se
+best_tau <- lasso_cv$lambda.min
+best_tau1se <- lasso_cv$lambda.1se
 ```
 
 La valeur de $\tau$ sélectionnée vaut .... 
 
-```{r,eval=F}
-g2=g2 + geom_vline(xintercept = best_tau,linetype="dotted", color = "red")+
-  geom_vline(xintercept = best_tau1se,linetype="dotted", color = "green")
+```{r, eval=FALSE}
+g2 <- g2 + 
+  geom_vline(xintercept = best_tau, linetype="dotted", color = "red") +
+  geom_vline(xintercept = best_tau1se, linetype="dotted", color = "green")
 g2
 ```
 
 ### Question 4 
+
 Quelle sélection de variables obtient-on alors ? 
 
-```{r,eval=F}
+```{r, eval=FALSE}
 coef(lasso_cv)
 ```
 
 
 ## Régression Elastic Net
+
 ### Question 1 
+
 Reprenez les questions précédentes pour ajuster une régression Elastic Net
 
-```{r,eval=F}
+```{r, eval=FALSE}
 fitEN <- glmnet(...)
-df=data.frame(tau = rep(fitEN$lambda,ncol(tildeX)), theta=as.vector(t(fitEN$beta)),variable=rep(c(colnames(tildeX)),each=length(fitEN$lambda)))
-g3 = ggplot(df,aes(x=tau,y=theta,col=variable))+
-  geom_line()+
-  theme(legend.position="bottom")
+df <- data.frame(tau = rep(fitEN$lambda, ncol(tildeX)),
+                 theta = as.vector(t(fitEN$beta)),
+                 variable = rep(c(colnames(tildeX)), 
+                                each = length(fitEN$lambda)))
+g3 <- ggplot(df, aes(x = tau, y = theta, col = variable)) +
+  geom_line() +
+  theme(legend.position = "bottom")
 ```
 
-```{r,eval=F}
-EN_cv <- cv.glmnet(tildeX, tildeY, alpha = 0.5, lambda = tau_seq,nfolds=10,type.measure=c("mse"),intercept=F)
-g3=g3 + geom_vline(xintercept = EN_cv$lambda.min,linetype="dotted", color = "red")+ geom_vline(xintercept = EN_cv$lambda.1se,linetype="dotted", color = "green")
+```{r, eval=FALSE}
+EN_cv <- cv.glmnet(tildeX, tildeY, alpha = 0.5, lambda = tau_seq,
+                   nfolds=10, type.measure=c("mse"), intercept = FALSE)
+g3 <- g3 + 
+  geom_vline(xintercept = EN_cv$lambda.min, linetype="dotted", color = "red") + 
+  geom_vline(xintercept = EN_cv$lambda.1se, linetype="dotted", color = "green")
 ggplotly(g3)
 ```
 
 
-### Question 2 
+### Question 2
+
 Comparez les coefficients obtenus avec la régression linéaire, la régression ridge, la régression Lasso et la régression ElasticNet
 
-```{r ,eval=F,echo=F}
-regusuel=lm(...)  # A COMPLETER
-df4=data.frame(x=rep(colnames(tildeX),4),
-               coef=c(as.vector(regusuel$coefficients),as.vector(coef(ridge_cv,s=ridge_cv$lambda.min)[-1]),as.vector(coef(lasso_cv)[-1]),as.vector(coef(EN_cv)[-1])),
-               reg=c(rep("reg.lin",ncol(tildeX)),rep("ridge",ncol(tildeX)),rep("lasso",ncol(tildeX)),rep("ElasticNet",ncol(tildeX))))
+```{r, eval = FALSE,echo = FALSE}
+regusuel <- lm(...)  # A COMPLETER
+df4 <- data.frame(x = rep(colnames(tildeX), 4),
+                  coef = c(as.vector(regusuel$coefficients),
+                           as.vector(coef(ridge_cv, s = ridge_cv$lambda.min)[-1]),
+                           as.vector(coef(lasso_cv)[-1]),
+                           as.vector(coef(EN_cv)[-1])),
+               reg=c(rep("reg.lin", ncol(tildeX)),
+                     rep("ridge", ncol(tildeX)),
+                     rep("lasso", ncol(tildeX)),
+                     rep("ElasticNet", ncol(tildeX))))
 
-g5=ggplot(df4)+
-  geom_point(aes(x=x,y=coef,col=reg))
+g5 <- ggplot(df4) +
+  geom_point(aes(x = x, y = coef, col = reg))
 g5
 ```
 
@@ -272,10 +303,10 @@ A l'aide des commandes suivantes, chargez les données et faites quelques statis
 ```{r}
 library(bestglm)
 data(SAheart)
-SAheart$chd<-as.factor(SAheart$chd)
+SAheart$chd <- as.factor(SAheart$chd)
 ```
 
-La description des données est disponible dans l'aide de R (tapez `? SAheart` dans la console). 
+La description des données est disponible dans l'aide de R (tapez `?SAheart` dans la console). 
 
 Le jeu de données est composé des variables suivantes : 
 
@@ -295,29 +326,32 @@ Le jeu de données est composé des variables suivantes :
 ```{r}
 str(SAheart)
 summary(SAheart)
-
-A<-data.frame(y=as.vector(as.matrix(t(SAheart[,-c(5,10)]))),x=rep(colnames(SAheart[,-c(5,10)]),
-                                                                  nrow(SAheart[,-c(5,10)])))
-g1=ggplot(A,aes(x=x,y=y))+
+SAheart_quanti <- SAheart[, -c(5,10)]
+A <- data.frame(y = as.vector(as.matrix(t(SAheart_quanti))),
+                x = rep(colnames(SAheart_quanti),
+                        nrow(SAheart_quanti)))
+g1 <- ggplot(A, aes(x = x, y = y)) +
   geom_boxplot()
-g2=ggplot(SAheart,aes(x=chd))+
+g2 <- ggplot(SAheart, aes(x = chd)) +
   geom_bar()
-g3=ggplot(SAheart,aes(x=famhist))+
+g3 = ggplot(SAheart, aes(x = famhist))+
   geom_bar()
 print(g1)
-grid.arrange(g2,g3,ncol=2)
+grid.arrange(g2, g3, ncol = 2)
 ```
 
 ### Question 2 
+
 Ajustez un modèle de régression logistique multiple additif à l'aide de la fonction `glm()`. 
 
-```{r,eval=F}
-modellogit = glm(...)
+```{r, eval=FALSE}
+modellogit <- glm(...)
 summary(modellogit)
 ```
 
 
 ### Question 3 
+
 Déterminez la valeur du pseudo-$R^2$ pour le modèle `modellogit`. 
 
 ```{r}
@@ -325,51 +359,54 @@ Déterminez la valeur du pseudo-$R^2$ pour le modèle `modellogit`.
 ```
 
 ### Question 4 
+
 Commentez les résultats obtenus via la commande suivante : 
 
-```{r,eval=F}
+```{r, eval=FALSE}
 coef(summary(modellogit))
 ```
 
 
 ### Question 5 
+
 Comparez les différentes procédures de sélection de variables mises en place par les commandes suivantes :
 
-```{r,eval=F}
-modelBIC<-bestglm(SAheart,family=binomial,IC="BIC")
+```{r, eval=FALSE}
+modelBIC <- bestglm(SAheart, family = binomial, IC = "BIC")
 modelBIC$BestModel
 summary(modelBIC)
 ```
 
-```{r,eval=F}
-modelAIC<-bestglm(SAheart,family=binomial,IC="AIC")
+```{r, eval=FALSE}
+modelAIC <- bestglm(SAheart, family = binomial, IC = "AIC")
 modelAIC$BestModel
 ```
 
-```{r,eval=F}
-step.backward<-step(modellogit)
+```{r, eval=FALSE}
+step.backward <- step(modellogit)
 ```
 
-```{r,eval=F}
-step.backward<-step(modellogit, direction="forward",k=log(nrow(SAheart)))
+```{r, eval=FALSE}
+step.backward <- step(modellogit, direction = "forward", k = log(nrow(SAheart)))
 ```
 
 
 ### Question 6 
+
 Confirmez par un test de sous-modèle le sous-modèle retenu *modelbest* dans la question précédente. 
 
-```{r,eval=F}
-modelbest= glm(.... )
-anova(modelbest,modellogit, test="Chisq")
+```{r, eval=FALSE}
+modelbest <- glm(.... )
+anova(modelbest, modellogit, test="Chisq")
 ```
 
 Par quels critères peut-on aussi comparer les deux modèles *modelbest* et *modellogit* ?
 
-
 ### Question 7 
+
 Comment s'interprètent les différents coefficients de *modelbest* ?
 
-```{r,eval=F}
+```{r, eval=FALSE}
 exp(modelbest$coefficients)
 ```
 	
@@ -384,41 +421,45 @@ Enfin les conditions de recueil (humides ou sèches) ont été notées pour test
 Chargez le jeu de données *Fourmis* et executez les commandes suivantes pour faire quelques statistiques descritpives. 
 
 ```{r}
-Fourmis <- read.table("Fourmis.txt",header=T, sep=',')
-Fourmis$Site=as.factor(Fourmis$Site)
-Fourmis$Conditions=as.factor(Fourmis$Conditions)
+url <- url("https://raw.githubusercontent.com/cmaugis/Stat-Avancees---PFB-Toulouse/main/Data/Fourmis.txt")
+Fourmis <- read.table(url, header = TRUE, sep = ',')
+Fourmis$Site <- as.factor(Fourmis$Site)
+Fourmis$Conditions <- as.factor(Fourmis$Conditions)
 summary(Fourmis)
 Fourmis %>% group_by(Site, Conditions) %>% summarise(n())
 ```
 
 ```{r}
-ggplot(data= Fourmis, aes(x=Site, y=Effectifs, col= Conditions)) + geom_boxplot() 
+ggplot(data = Fourmis, aes(x = Site, y = Effectifs, col = Conditions)) + geom_boxplot() 
 ```
 
 ```{r}
-ggplot(data= Fourmis, aes(x=Weight, y=Effectifs, col= Conditions)) + geom_point()
+ggplot(data = Fourmis, aes(x = Weight, y = Effectifs, col = Conditions)) + geom_point()
 ```
 
 ### Question 2 
+
 Dans cette question, on cherche à expliquer le nombre de fourmis présentes dans un échantillon de sol en prenant en compte les conditions de recueil, le site et l'interaction entre ces deux facteurs. 
 
 - Ecrivez un modèle linéaire généralisé *modpois* adapté et programmez-le à l'aide de la fonction `glm()`. 
 
-```{r,eval=F}
-modpois = glm(...)
+```{r, eval=FALSE}
+modpois <- glm(...)
 ```
 
 - Etudiez si on peut simplifier le modèle *modpois*. Vous pouvez vous aider de la fonction `anova(....,test="Chisq")`. 
 
 - A l'aide des commandes suivantes, on obtient le nombre moyen d'espèces de fourmis attendu sur un échantillon de terre aux différents sites pour les deux conditions. Commentez. 
 
-```{r,eval=F}
-newx = data.frame(Site=rep(levels(Fourmis$Site),2),Conditions=rep(levels(Fourmis$Conditions),each=4))
-newx=data.frame(newx,lambdahat=predict(modpois,newdata=newx,type="response"))
+```{r, eval=FALSE}
+newx <- data.frame(Site = rep(levels(Fourmis$Site), 2),
+                   Conditions = rep(levels(Fourmis$Conditions), each = 4))
+newx <- data.frame(newx, lambdahat = predict(modpois, newdata = newx, type = "response"))
 newx
 ```
 
 ### Question 3 
+
 On souhaite maintenant étudier le nombre d'espèces de fourmis présentes dans une unité de volume, en fonction des caractéristiques du site.  Nous allons ici intégrer l'information du poids (*Weight*) qui est vu comme un indicateur de l'épaisseur de la litière. 
 
 On remarque que la relation entre les paramètres des lois de Poisson du nombre d'espèces
@@ -438,13 +479,21 @@ La variable *Weight* est donc considérée comme un offset.
 
 - Ajustez ce modèle à l'aide de l'option `"offset"` de la fonction `glm()`. 
 
+```{r}
+# A COMPLETER
+```
+
 - Quel est le nombre moyen d'espèces de fourmis attendu sur un échantillon de terre qui pèse 10kg aux
 différents sites pour les deux conditions ?
+
+```{r}
+# A COMPLETER
+```
 
 
 ### Question 4 
 
-Est-ce-qu'une modélisation avec un modèle prenant la sur-dispersion est plus appropriée ? 
+Est-ce-qu'une modélisation avec un modèle prenant en compte la sur-dispersion est plus appropriée ? 
 
 ```{r}
 # A COMPLETER

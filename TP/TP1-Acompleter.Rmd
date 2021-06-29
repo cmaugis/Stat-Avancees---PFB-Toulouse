@@ -19,16 +19,16 @@ background-color: #C9DDE4;
 ```{r setup, echo=FALSE, cache=FALSE}
 library(knitr)
 ## Global options
-options(max.print="75")
-opts_chunk$set(echo=TRUE,
-	             cache=FALSE,
-               prompt=FALSE,
-               tidy=TRUE,
-               comment=NA,
-               message=FALSE,
-               warning=FALSE,
-               class.source="badCode")
-opts_knit$set(width=75)
+options(max.print = "75")
+opts_chunk$set(echo = TRUE,
+	             cache = FALSE,
+               prompt = FALSE,
+               tidy = TRUE,
+               comment = NA,
+               message = FALSE,
+               warning = FALSE,
+               class.source = "badCode")
+opts_knit$set(width = 75)
 ```
 
 
