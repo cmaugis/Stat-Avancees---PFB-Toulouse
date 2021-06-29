@@ -1598,10 +1598,10 @@ F-statistic: 32.67 on 10 and 101 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div id="question-1" class="section level2">
 <h2><span class="header-section-number">1.2</span> Question 1</h2>
 <p>Dans le <code>summary(reg.mul)</code>, un test est fait sur chaque coefficient. Il revient à tester que la variable n’apporte pas d’information supplémentaire sachant que toutes les autres variables sont dans le modèle.</p>
-<p>Ici, nous souhaitons aller plus loin dans la possible simplification du modèle. Nous allons utiliser des procédures de choix de modèles pour sélectionner les variables significatives. On va ici comparer la sélection de variable obtenue par différents critères: BIC, AIC, <span class="math inline">\(R^2\)</span> ajusté, Cp de Mallows. Pour cela, vous pouvez utiliser la fonction <code>regsubsets()</code> de la librairie <em>leaps</em> et la fonction <code>stepAIC()</code> de la librairie <em>MASS</em>. Commentez les résultats obtenus avec les différents critères, vous pourrez vous aider des commandes suivantes :</p>
+<p>Ici, nous souhaitons aller plus loin dans la possible simplification du modèle. Nous allons utiliser des procédures de choix de modèles pour sélectionner les variables significatives. On va ici comparer la sélection de variable obtenue par différents critères: BIC, AIC, <span class="math inline">\(R^2\)</span> ajusté, <span class="math inline">\(C_p\)</span> de Mallows. Pour cela, vous pouvez utiliser la fonction <code>regsubsets()</code> de la librairie <em>leaps</em> et la fonction <code>stepAIC()</code> de la librairie <em>MASS</em>. Commentez les résultats obtenus avec les différents critères, vous pourrez vous aider des commandes suivantes :</p>
 <pre class="r badCode"><code>library(leaps)
-choix = regsubsets(...)  # A COMPLETER
-plot(choix, scale = ....)
+choix &lt;- regsubsets(...)  # A COMPLETER
+plot(choix, scale = ...)
 
 library(MASS)
 stepAIC(...)</code></pre>

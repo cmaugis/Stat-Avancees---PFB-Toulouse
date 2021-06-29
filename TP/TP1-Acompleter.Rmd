@@ -160,7 +160,7 @@ Commentez.
 
 ## Question 2 
 
-Effectuez la régression linéaire à l'aide de la fonction `lm()` et exploitez les résultats. 
+Effectuez la régression linéaire sur l'ensemble des variables quantitatives (pas seulement les 3 de la question précédente) à l'aide de la fonction `lm()` et exploitez les résultats. 
 
 ```{r}
 # A COMPLETER
@@ -268,7 +268,7 @@ table(ozone$vent, ozone$pluie)
 
 Représentez la concentration en ozone pour chaque modalité croisée du vent et de la pluie à l'aide de la commande suivante et commentez. 
 
-```{r,eval=F}
+```{r,eval=FALSE}
 ggplot(ozone, aes(x = vent, y = maxO3, fill = pluie)) +
   geom_boxplot() 
 ``` 
@@ -297,7 +297,7 @@ Dans cette partie, on s'intéresse à la relation du taux maximal d'ozone (*maxO
 
 A l'aide des commandes suivantes, représentez le nuage de points entre la variable à expliquer *maxO3* et la variable quantitative explicative *maxO3v*, en fonction des modalités de la variable qualitative *pluie*. Commentez. 
 
-```{r,eval=FALSE}
+```{r, eval=FALSE}
 ggplot(ozone, aes(x = maxO3v, y = maxO3))+ 
   geom_point(aes(shape = pluie, col = pluie)) 
 ```
@@ -306,15 +306,15 @@ ggplot(ozone, aes(x = maxO3v, y = maxO3))+
 
 A l'aide de la fonction `lm()` ajustez un modèle d'analyse de covariance avec interaction.
 
-```{r,eval=FALSE}
+```{r, eval=FALSE}
 complet <- lm(....)
 summary(complet)
 ```
 
 Graphiquement, on vient d'ajuster les deux droites suivantes : 
 
-```{r,eval=FALSE}
-ggplot(ozone,aes(x = maxO3v, y = maxO3, shape = pluie, col = pluie)) + 
+```{r, eval=FALSE}
+ggplot(ozone, aes(x = maxO3v, y = maxO3, shape = pluie, col = pluie)) + 
   geom_point() +
   geom_smooth(method = 'lm', se = TRUE) 
 ```

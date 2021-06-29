@@ -68,12 +68,14 @@ Les 13 variables observées sont :
 Les données sont disponibles [ici]( https://github.com/cmaugis/Stat-Avancees---PFB-Toulouse). 
 
 Pour les lire, vous pouvez utiliser la commande suivante :
+
 ```{r}
 url <- url("https://raw.githubusercontent.com/cmaugis/Stat-Avancees---PFB-Toulouse/main/Data/Ozone.txt")
 ozone = read.table(url)
 ozone$vent <- as.factor(ozone$vent)
 ozone$pluie <- as.factor(ozone$pluie)
 ```
+
 Vous pouvez obtenir un résumé du jeu de données `ozone` avec la commande `summary()`. 
 
 ```{r}
@@ -93,13 +95,13 @@ summary(reg.mul)
 
 Dans le `summary(reg.mul)`, un test est fait sur chaque coefficient. Il revient à tester que la variable n'apporte pas d'information supplémentaire sachant que toutes les autres variables sont dans le modèle. 
 
-Ici, nous souhaitons aller plus loin dans la possible simplification du modèle. Nous allons utiliser des procédures de choix de modèles pour sélectionner les variables significatives. On va ici comparer la sélection de variable obtenue par différents critères: BIC,  AIC, $R^2$ ajusté, Cp de Mallows. Pour cela, vous pouvez utiliser la fonction  `regsubsets()` de la librairie *leaps* et la fonction `stepAIC()` de la librairie *MASS*. 
+Ici, nous souhaitons aller plus loin dans la possible simplification du modèle. Nous allons utiliser des procédures de choix de modèles pour sélectionner les variables significatives. On va ici comparer la sélection de variable obtenue par différents critères: BIC,  AIC, $R^2$ ajusté, $C_p$ de Mallows. Pour cela, vous pouvez utiliser la fonction  `regsubsets()` de la librairie *leaps* et la fonction `stepAIC()` de la librairie *MASS*. 
 Commentez les résultats obtenus avec les différents critères, vous pourrez vous aider des commandes suivantes :
 
 ```{r, eval=FALSE}
 library(leaps)
-choix=regsubsets(...) # A COMPLETER
-plot(choix,scale= ....)
+choix <- regsubsets(...) # A COMPLETER
+plot(choix,scale =  ...)
 
 library(MASS)
 stepAIC(...)
@@ -120,6 +122,7 @@ anova(reg.fin,reg.mul)
 
 
 # Régressions régularisées
+
 On va s'intéresser aux régressions ridge, Lasso et Elastic-net dans cette partie. On commence par centrer et réduire les données avant de mettre en place et comparer ces méthodes de régression régularisées. 
 
 ```{r}
