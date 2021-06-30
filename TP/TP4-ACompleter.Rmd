@@ -1,0 +1,277 @@
+---
+title: "TP clustering - Partie 4"
+date: "`r Sys.Date()`"
+author : "Cathy Maugis-Rabusseau & Pierre Neuvial"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth : 4
+    number_sections : true
+---
+
+```{css,echo=F}
+.badCode {
+background-color: #C9DDE4;
+}
+```
+
+```{r setup, echo=FALSE, cache=FALSE}
+library(knitr)
+## Global options
+options(max.print = "75")
+opts_chunk$set(echo = TRUE,
+	             cache = FALSE,
+               prompt = FALSE,
+               tidy = TRUE,
+               comment = NA,
+               message = FALSE,
+               warning = FALSE,
+               class.source = "badCode")
+opts_knit$set(width = 75)
+```
+
+
+Les librairies R nécessaires pour ce TP : 
+
+```{r}
+library(FactoMineR)
+library(ggplot2)
+library(gridExtra)
+library(factoextra)
+library(cluster)
+library(mclust)
+```
+
+
+# Description des données 
+
+Les données étudiées dans ce TP sont issues d'analyses chimiques de plusieurs vins de la même région de l'Italie mais correspondant à trois cépages différents. Les analyses chimiques ont permis de mesurer les quantités de 13 constituants contenus dans chacun de ces 3 types de vins.
+
+
+## Question 1 
+
+Commencez par lire les données et vérifier si la lecture s'est bien passée à l'aide des commandes suivantes. 
+
+```{r}
+url <- url("https://raw.githubusercontent.com/cmaugis/Stat-Avancees---PFB-Toulouse/main/Data/WineTP.txt")
+Wine = read.table(url)
+Wine[,1]<-as.factor(Wine$label)
+dim(Wine)
+head(Wine)
+```
+
+## Question 2 
+
+A l'aide de la fonction `table()` déterminez la répartition des 178 vins en 3 cépages. 
+
+```{r}
+# A COMPLETER
+```
+
+
+## Question 3 
+A l'aide des commandes suivantes, faites une ACP des données. Commentez. 
+
+```{r,eval=F}
+respca <- PCA(Wine,scale.unit = TRUE, quali.sup = 1, graph = FALSE)
+plot(respca,choix = "ind", habillage = 1, label = "none")
+plot(respca,choix = "varcor")
+```
+
+
+# Méthodes par partitionnement
+
+## Question 1 
+A l'aide de la fonction `kmeans()`, déterminez une classification en $K=3$ groupes avec la méthode des Kmeans. 
+
+```{r,eval=F}
+ClassifKmeans3 = kmeans(...)
+```
+
+Vous pouvez visualiser la classification obtenue avec la commande suivante :
+
+```{r,eval=F}
+fviz_cluster(ClassifKmeans3,data=Wine[,-1],ellipse.type="norm",labelsize=8)+ggtitle("")
+```
+
+A l'aide des commandes suivantes, comparez la classification obtenue avec la répartition en cépages. 
+
+```{r,eval=F}
+table(Wine$label,ClassifKmeans3$cluster)
+adjustedRandIndex(Wine$label,ClassifKmeans3$cluster)
+classError(Wine$label,ClassifKmeans3$cluster)$errorRate
+```
+
+
+## Question 2 
+A l'aide de la fonction `pam()`, déterminez une classification en $K=3$ groupes avec la méthode PAM. 
+
+```{r,eval=F}
+ClassifPAM3 = pam(...)
+```
+
+Visualisez la classification obtenue et comparez-la avec la répartition en cépage. 
+
+```{r,eval=F}
+# A COMPLETER
+```
+
+Comparez cette classification avec celle des Kmeans : 
+
+```{r,eval=F}
+# A COMPLETER
+```
+
+## Question 3 
+Dans cette question, on souhaite sélectionner le nombre de classes pour la méthode des Kmeans. A l'aide des commandes suivantes, comparez les différents critères. 
+
+```{r,eval=F,message=F}
+PlotCriteres<-function(Data,Kmax){
+Iintra=NULL
+CH=NULL
+Silhou=NULL
+for (k in 2:Kmax){
+   Classif = kmeans(Data,k,nstart=10)
+   Iintra = c(Iintra,sum(Classif$withinss)/nrow(Data))
+   aux = silhouette(Classif$cl, daisy(Data))
+   Silhou = c(Silhou,mean(aux[,3]))
+   CH=c(CH,calinhara(Data,Classif$cluster))
+}
+gskmn <- clusGap(Data, FUN = kmeans, nstart = Kmax, K.max = Kmax, B = 60)
+
+dfindice=data.frame(K=2:Kmax,CH=CH,Iintra=Iintra,Silhouette=Silhou)
+g1=ggplot(dfindice,aes(x=K,y=Iintra))+
+  geom_point()+
+  geom_line()+
+  ggtitle("Iintra")+
+  theme(plot.title = element_text(size =9))+ylab("")
+g2=ggplot(dfindice,aes(x=K,y=CH))+
+  geom_point()+
+  geom_line()+
+  ggtitle("Calinski-Harabasz")+
+  theme(plot.title = element_text(size =9))+ylab("")
+g3=ggplot(dfindice,aes(x=K,y=Silhouette))+
+  geom_point()+
+  geom_line()+ggtitle("Silhouette")+theme(plot.title = element_text(size =9))+ylab("")
+grid.arrange(g1,g2,g3,ncol=3)
+}
+```
+
+```{r,eval=F}
+PlotCriteres(Data=Wine[,-1],Kmax=10)
+```
+
+## Question 4 
+Etudiez la classification retenue avec le critère Silhouette.
+
+```{r,eval=F}
+ClassifSilh<-kmeans( ... )
+aux<-silhouette(ClassifSilh$cl, daisy(Wine[,-1]))
+fviz_silhouette(aux)+theme(plot.title = element_text(size =9))
+# A COMPLETER
+```
+
+
+## Question 5 
+En adaptant des commandes des questions précédentes, déterminez une classification des vins à partir des coordonnées de l'ACP à l'aide de la méthode des Kmeans. 
+
+```{r,eval=F}
+DataACP = respca$ind$coord
+dim(DataACP)
+```
+
+```{r, eval=F}
+# A COMPLETER
+```
+
+
+# Classification hiérarchique
+
+## Question 1 
+Comparez les classifications en 3 classes obtenues avec une CAH avec le lien de ward etle lien complet respectivement. 
+
+```{r,eval=F}
+d<-dist(Wine[,-1],method="euclidian")
+hward<-hclust(....)
+clward<-cutree(...)
+hcomplete<-hclust(...)
+clcomplete<-cutree(...)
+adjustedRandIndex(clward,clcomplete)
+table(clward,clcomplete)
+```
+
+```{r,eval=F}
+fviz_dend(hward,k=3,rect = TRUE, rect_fill = TRUE,
+          palette = "npg",rect_border = "npg",
+          show_labels = FALSE,labels_track_height = 0.8)
+fviz_dend(hcomplete,k=3,rect = TRUE, rect_fill = TRUE,
+          palette = "npg",rect_border = "npg",
+          show_labels = FALSE,labels_track_height = 0.8)
+```
+
+## Question 2 
+On se concentre maintenant sur la classification hiérarchique par la méthode de Ward. 
+Tracez la courbe des poids de l'arbre et sélectionnez un nombre de classes. 
+
+```{r,eval=F}
+ggplot(data.frame(K=1:20,height=sort(hward$height,decreasing=T)[1:20]),aes(x=K,y=height))+
+  geom_point()+
+  geom_line()+ylab("")+
+  ggtitle("height")+
+  theme(plot.title = element_text(size =9))
+```
+
+Visualisez la classification obtenue et comparez-la à la répartition des cépages. 
+
+```{r,eval=F}
+# A COMPLETER
+```
+
+## Question 3 
+Mettez en place une classification hiérarchique à partir des coordonnées de l'ACP. Comparez à la répartition par cépages. 
+```{r,eval=F}
+# A COMPLETER
+```
+
+
+# Modèles de mélanges
+
+On va maintenant s'intéresser à l'utilisation de modèles de mélanges gaussiens pour déterminer une classification des vins. 
+
+## Question 1 
+A l'aide des fonctions `mclustBIC()` et `Mclust()`, déterminez une classification des données en considérant 
+
+  + toutes les formes de mélanges gaussiens
+  + un nombre de classes maximal à 9 utilisant 
+  + le critère BIC pour la sélection de modèle 
+  
+```{r}
+# A COMPLETER
+```
+  
+
+
+## Question 2 
+A l'aide des commandes suivantes, étudiez les probabilités conditionnelles d'appartenance.
+
+```{r,eval=F}
+df=data.frame(Cluster=as.factor(apply(mselectBIC$z,1,which.max)),probapost=apply(mselectBIC$z,1,max))
+ggplot(df,aes(x=Cluster,y=probapost))+
+  geom_boxplot()
+```
+
+## Question 3
+Visualisez la classification obtenue à l'aide de la fonction `fviz_mclust()`et comparez-la avec la répartition par cépages. 
+
+```{r}
+# A COMPLETER
+```
+
+## Question 4 
+Reprenez les questions précédentes pour la sélection de modèles avec le critère ICL. 
+
+```{r}
+# A COMPLETER
+```
+
