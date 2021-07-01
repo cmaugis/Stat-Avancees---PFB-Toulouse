@@ -4,7 +4,7 @@
 
 - Avant la formation :
   + Installer Rstudio (https://www.rstudio.com/products/rstudio/download/) et R (https://cran.r-project.org/). **Merci de vérifier que vous avez bien une version récente de R (≥ 4.0)**
-  + Installer les packages R suivants : bestglm, corrplot, ellipse, factoextra, FactoMineR, ggfortify, ggplot2, glmnet, gridExtra, knitr, leaps, mclust, plotly, randomForest, ROCR, rpart, rpart.plot, tidyverse, VGAM.
+  + Installer les packages R suivants : bestglm, caret, class, corrplot, ellipse, factoextra, FactoMineR, ggfortify, ggplot2, glmnet, gridExtra, knitr, leaps, mclust, plotly, randomForest, ROCR, rpart, rpart.plot, tidyverse, VGAM.
 
 Pour installer un package R, deux options:
 
@@ -15,6 +15,8 @@ Pour l'option 2, il suffit donc de copier (une par une) les lignes suivantes dan
 
 ```r
 install.packages("bestglm")
+install.packages("caret")
+install.packages("class")
 install.packages("corrplot")
 install.packages("ellipse")
 install.packages("factoextra")
